@@ -41,15 +41,17 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
             </div>
         </Form>
         <p css={tw`text-center text-neutral-500 text-xs mt-4`}>
-            &copy; 2015 - {new Date().getFullYear()}&nbsp;
             <a
-                rel={'noopener nofollow noreferrer'}
-                href={'https://pterodactyl.io'}
+                rel={'noopener noreferrer'}
+                href={'https://www.jifercraft.com/'}
                 target={'_blank'}
                 css={tw`no-underline text-neutral-500 hover:text-neutral-300`}
             >
-                Pterodactyl Software
+                JiferCloud Hosting&reg;
             </a>
+            &nbsp;&copy; 2020 - {new Date().getFullYear()}
+            <br />
+            Expansi&oacute;n de JiferCraft Studios
         </p>
     </Container>
 ));
