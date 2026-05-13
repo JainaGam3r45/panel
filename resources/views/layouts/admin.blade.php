@@ -155,11 +155,10 @@
                 </section>
             </div>
             <footer class="main-footer">
-                <div class="pull-right small text-gray" style="margin-right:10px;margin-top:-7px;">
-                    <strong><i class="fa fa-fw {{ $appIsGit ? 'fa-git-square' : 'fa-code-fork' }}"></i></strong> {{ $appVersion }}<br />
-                    <strong><i class="fa fa-fw fa-clock-o"></i></strong> {{ round(microtime(true) - LARAVEL_START, 3) }}s
+                <div class="text-right small text-gray">
+                    <a href="https://www.jifercraft.com" target="_blank" rel="noopener noreferrer">JiferCloud Hosting</a> &copy; 2020 - {{ date('Y') }}<br />
+                    Expansión de JiferCraft Studios
                 </div>
-                Copyright &copy; 2015 - {{ date('Y') }} <a href="https://pterodactyl.io/">Pterodactyl Software</a>.
             </footer>
         </div>
         @section('footer-scripts')
