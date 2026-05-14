@@ -12,6 +12,7 @@ import GreyRowBox from '@/components/elements/GreyRowBox';
 import getServerBackups from '@/api/swr/getServerBackups';
 import { ServerBackup } from '@/api/server/types';
 import { SocketEvent } from '@/components/server/events';
+import { ServerContext } from '@/state/server';
 
 interface Props {
     backup: ServerBackup;
@@ -20,10 +21,21 @@ interface Props {
 
 export default ({ backup, className }: Props) => {
     const { mutate } = getServerBackups();
+    const backupSizeLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backupSize);
+    const backupStorageLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backupStorage);
 
     useWebsocketEvent(`${SocketEvent.BACKUP_COMPLETED}:${backup.uuid}` as SocketEvent, (data) => {
         try {
             const parsed = JSON.parse(data);
+            const fileSize = parsed.file_size || 0;
+            const failureReason =
+                parsed.is_successful === false
+                    ? backupSizeLimit > 0 && fileSize > backupSizeLimit * 1024 * 1024
+                        ? `Backup exceeds the ${backupSizeLimit} MiB per-backup size limit.`
+                        : backupStorageLimit > 0
+                        ? `Backup exceeds the ${backupStorageLimit} MiB total backup storage limit.`
+                        : 'Backup failed to complete.'
+                    : null;
 
             mutate(
                 (data) => ({
@@ -33,9 +45,10 @@ export default ({ backup, className }: Props) => {
                             ? b
                             : {
                                   ...b,
-                                  isSuccessful: parsed.is_successful || true,
+                                  isSuccessful: parsed.is_successful === undefined ? true : parsed.is_successful,
                                   checksum: (parsed.checksum_type || '') + ':' + (parsed.checksum || ''),
-                                  bytes: parsed.file_size || 0,
+                                  bytes: fileSize,
+                                  failureReason,
                                   completedAt: new Date(),
                               }
                     ),
@@ -78,6 +91,9 @@ export default ({ backup, className }: Props) => {
                         )}
                     </div>
                     <p css={tw`mt-1 md:mt-0 text-xs text-neutral-400 font-mono truncate`}>{backup.checksum}</p>
+                    {backup.completedAt !== null && !backup.isSuccessful && backup.failureReason && (
+                        <p css={tw`mt-1 text-xs text-red-300 truncate`}>{backup.failureReason}</p>
+                    )}
                 </div>
             </div>
             <div css={tw`flex-1 md:flex-none md:w-48 mt-4 md:mt-0 md:ml-8 md:text-center`}>
