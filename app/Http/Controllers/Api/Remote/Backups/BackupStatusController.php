@@ -9,6 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
+use Pterodactyl\Services\Backups\BackupQuotaService;
+use Pterodactyl\Services\Backups\DeleteBackupService;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Extensions\Filesystem\S3Filesystem;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
@@ -20,8 +22,11 @@ class BackupStatusController extends Controller
     /**
      * BackupStatusController constructor.
      */
-    public function __construct(private BackupManager $backupManager)
-    {
+    public function __construct(
+        private BackupManager $backupManager,
+        private BackupQuotaService $backupQuotaService,
+        private DeleteBackupService $deleteBackupService,
+    ) {
     }
 
     /**
@@ -52,12 +57,21 @@ class BackupStatusController extends Controller
             throw new BadRequestHttpException('Cannot update the status of a backup that is already marked as completed.');
         }
 
-        $action = $request->boolean('successful') ? 'server:backup.complete' : 'server:backup.fail';
+        $successful = $request->boolean('successful');
+        $deleteFailedBackup = false;
+
+        if ($successful) {
+            $size = (int) $request->input('size');
+            $successful = $this->backupQuotaService->sizeFitsLimit($server, $size)
+                && $this->backupQuotaService->prepareStorageForCompletedBackup($model, $size);
+
+            $deleteFailedBackup = !$successful;
+        }
+
+        $action = $successful ? 'server:backup.complete' : 'server:backup.fail';
         $log = Activity::event($action)->subject($model, $model->server)->property('name', $model->name);
 
-        $log->transaction(function () use ($model, $request) {
-            $successful = $request->boolean('successful');
-
+        $log->transaction(function () use ($model, $request, $successful) {
             $model->fill([
                 'is_successful' => $successful,
                 // Change the lock state to unlocked if this was a failed backup so that it can be
@@ -76,6 +90,10 @@ class BackupStatusController extends Controller
                 $this->completeMultipartUpload($model, $adapter, $successful, $request->input('parts'));
             }
         });
+
+        if ($deleteFailedBackup) {
+            $this->deleteBackupService->handle($model);
+        }
 
         return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }
