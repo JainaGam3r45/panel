@@ -46,6 +46,8 @@ class UpdateServerBuildConfigurationRequest extends ServerWriteRequest
             'feature_limits.databases' => $rules['database_limit'],
             'feature_limits.allocations' => $rules['allocation_limit'],
             'feature_limits.backups' => $rules['backup_limit'],
+            'feature_limits.backup_storage' => 'sometimes|nullable|integer|min:0',
+            'feature_limits.backup_size' => 'sometimes|nullable|integer|min:0',
         ];
     }
 
@@ -55,11 +57,14 @@ class UpdateServerBuildConfigurationRequest extends ServerWriteRequest
     public function validated($key = null, $default = null): array
     {
         $data = parent::validated();
+        $server = $this->parameter('server', Server::class);
 
         $data['allocation_id'] = $data['allocation'];
         $data['database_limit'] = $data['feature_limits']['databases'] ?? null;
         $data['allocation_limit'] = $data['feature_limits']['allocations'] ?? null;
         $data['backup_limit'] = $data['feature_limits']['backups'] ?? null;
+        $data['backup_storage_limit'] = $data['feature_limits']['backup_storage'] ?? $server->backup_storage_limit;
+        $data['backup_size_limit'] = $data['feature_limits']['backup_size'] ?? $server->backup_size_limit;
         unset($data['allocation'], $data['feature_limits']);
 
         // Adjust the limits field to match what is expected by the model.
@@ -87,6 +92,8 @@ class UpdateServerBuildConfigurationRequest extends ServerWriteRequest
             'feature_limits.databases' => 'Database Limit',
             'feature_limits.allocations' => 'Allocation Limit',
             'feature_limits.backups' => 'Backup Limit',
+            'feature_limits.backup_storage' => 'Backup Storage Limit',
+            'feature_limits.backup_size' => 'Backup Size Limit',
         ];
     }
 
