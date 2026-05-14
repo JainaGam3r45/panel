@@ -119,6 +119,22 @@
                                     </div>
                                     <p class="text-muted small">The total number of backups that can be created for this server.</p>
                                 </div>
+                                <div class="form-group col-xs-6">
+                                    <label for="backup_storage_limit" class="control-label">Backup Storage Limit</label>
+                                    <div class="input-group">
+                                        <input type="text" name="backup_storage_limit" class="form-control" value="{{ old('backup_storage_limit', $server->backup_storage_limit) }}"/>
+                                        <span class="input-group-addon">MiB</span>
+                                    </div>
+                                    <p class="text-muted small">The total storage available for all backups on this server. Set to <code>0</code> to allow unlimited backup storage.</p>
+                                </div>
+                                <div class="form-group col-xs-6">
+                                    <label for="backup_size_limit" class="control-label">Backup Size Limit</label>
+                                    <div class="input-group">
+                                        <input type="text" name="backup_size_limit" class="form-control" value="{{ old('backup_size_limit', $server->backup_size_limit) }}"/>
+                                        <span class="input-group-addon">MiB</span>
+                                    </div>
+                                    <p class="text-muted small">The maximum size allowed for each backup on this server. Set to <code>0</code> to allow backups of any size.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
