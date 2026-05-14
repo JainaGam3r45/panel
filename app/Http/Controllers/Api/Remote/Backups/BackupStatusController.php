@@ -10,7 +10,6 @@ use Pterodactyl\Facades\Activity;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
 use Pterodactyl\Services\Backups\BackupQuotaService;
-use Pterodactyl\Services\Backups\DeleteBackupService;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Extensions\Filesystem\S3Filesystem;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
@@ -25,7 +24,6 @@ class BackupStatusController extends Controller
     public function __construct(
         private BackupManager $backupManager,
         private BackupQuotaService $backupQuotaService,
-        private DeleteBackupService $deleteBackupService,
     ) {
     }
 
@@ -58,20 +56,23 @@ class BackupStatusController extends Controller
         }
 
         $successful = $request->boolean('successful');
-        $deleteFailedBackup = false;
+        $failureReason = $successful ? null : 'Backup failed to complete.';
 
         if ($successful) {
             $size = (int) $request->input('size');
-            $successful = $this->backupQuotaService->sizeFitsLimit($server, $size)
-                && $this->backupQuotaService->prepareStorageForCompletedBackup($model, $size);
-
-            $deleteFailedBackup = !$successful;
+            if (!$this->backupQuotaService->sizeFitsLimit($server, $size)) {
+                $successful = false;
+                $failureReason = sprintf('Backup exceeds the %d MiB per-backup size limit.', $server->backup_size_limit);
+            } elseif (!$this->backupQuotaService->prepareStorageForCompletedBackup($model, $size)) {
+                $successful = false;
+                $failureReason = sprintf('Backup exceeds the %d MiB total backup storage limit.', $server->backup_storage_limit);
+            }
         }
 
         $action = $successful ? 'server:backup.complete' : 'server:backup.fail';
         $log = Activity::event($action)->subject($model, $model->server)->property('name', $model->name);
 
-        $log->transaction(function () use ($model, $request, $successful) {
+        $log->transaction(function () use ($model, $request, $successful, $failureReason) {
             $model->fill([
                 'is_successful' => $successful,
                 // Change the lock state to unlocked if this was a failed backup so that it can be
@@ -80,6 +81,7 @@ class BackupStatusController extends Controller
                 'is_locked' => $successful ? $model->is_locked : false,
                 'checksum' => $successful ? ($request->input('checksum_type') . ':' . $request->input('checksum')) : null,
                 'bytes' => $successful ? $request->input('size') : 0,
+                'failure_reason' => $failureReason,
                 'completed_at' => CarbonImmutable::now(),
             ])->save();
 
@@ -90,10 +92,6 @@ class BackupStatusController extends Controller
                 $this->completeMultipartUpload($model, $adapter, $successful, $request->input('parts'));
             }
         });
-
-        if ($deleteFailedBackup) {
-            $this->deleteBackupService->handle($model);
-        }
 
         return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
     }

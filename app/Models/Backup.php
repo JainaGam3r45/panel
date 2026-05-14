@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $disk
  * @property string|null $checksum
  * @property int $bytes
+ * @property string|null $failure_reason
  * @property string|null $upload_id
  * @property \Carbon\CarbonImmutable|null $completed_at
  * @property \Carbon\CarbonImmutable $created_at
@@ -58,6 +59,7 @@ class Backup extends Model implements Identifiable
         'is_locked' => false,
         'checksum' => null,
         'bytes' => 0,
+        'failure_reason' => null,
         'upload_id' => null,
     ];
 
@@ -73,6 +75,7 @@ class Backup extends Model implements Identifiable
         'disk' => 'required|string',
         'checksum' => 'nullable|string',
         'bytes' => 'numeric',
+        'failure_reason' => 'nullable|string',
         'upload_id' => 'nullable|string',
     ];
 

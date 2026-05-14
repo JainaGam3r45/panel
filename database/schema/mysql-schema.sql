@@ -142,6 +142,7 @@ CREATE TABLE `backups` (
   `disk` varchar(191) NOT NULL,
   `checksum` varchar(191) DEFAULT NULL,
   `bytes` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `failure_reason` varchar(191) DEFAULT NULL,
   `completed_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -879,3 +880,4 @@ INSERT INTO `migrations` VALUES (192,'2022_12_12_213937_update_mail_settings_to_
 INSERT INTO `migrations` VALUES (193,'2023_01_24_210051_add_uuid_column_to_failed_jobs_table',1);
 INSERT INTO `migrations` VALUES (194,'2023_02_23_191004_add_expires_at_column_to_api_keys_table',1);
 INSERT INTO `migrations` VALUES (195,'2026_05_13_000001_add_backup_storage_limits_to_servers',1);
+INSERT INTO `migrations` VALUES (196,'2026_05_13_000002_add_failure_reason_to_backups',1);
