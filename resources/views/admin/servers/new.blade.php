@@ -138,14 +138,6 @@
                         </div>
                         <p class="text-muted small">The total storage available for all backups on this server. Set to <code>0</code> to allow unlimited backup storage.</p>
                     </div>
-                    <div class="form-group col-xs-6">
-                        <label for="pBackupSizeLimit" class="control-label">Backup Size Limit</label>
-                        <div class="input-group">
-                            <input type="text" id="pBackupSizeLimit" name="backup_size_limit" class="form-control" value="{{ old('backup_size_limit', 0) }}"/>
-                            <span class="input-group-addon">MiB</span>
-                        </div>
-                        <p class="text-muted small">The maximum size allowed for each backup on this server. Set to <code>0</code> to allow backups of any size.</p>
-                    </div>
                 </div>
             </div>
         </div>

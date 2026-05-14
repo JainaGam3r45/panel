@@ -13,7 +13,6 @@ class AddBackupStorageLimitsToServers extends Migration
     {
         Schema::table('servers', function (Blueprint $table) {
             $table->unsignedInteger('backup_storage_limit')->default(0)->after('backup_limit');
-            $table->unsignedInteger('backup_size_limit')->default(0)->after('backup_storage_limit');
         });
     }
 
@@ -23,7 +22,7 @@ class AddBackupStorageLimitsToServers extends Migration
     public function down(): void
     {
         Schema::table('servers', function (Blueprint $table) {
-            $table->dropColumn(['backup_storage_limit', 'backup_size_limit']);
+            $table->dropColumn('backup_storage_limit');
         });
     }
 }

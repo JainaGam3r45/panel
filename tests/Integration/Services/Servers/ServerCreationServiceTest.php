@@ -149,7 +149,6 @@ class ServerCreationServiceTest extends IntegrationTestCase
         $this->assertSame(0, $response->allocation_limit);
         $this->assertSame(0, $response->backup_limit);
         $this->assertSame(0, $response->backup_storage_limit);
-        $this->assertSame(0, $response->backup_size_limit);
     }
 
     /**

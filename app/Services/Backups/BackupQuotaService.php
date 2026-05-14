@@ -36,11 +36,6 @@ class BackupQuotaService
         }
     }
 
-    public function sizeFitsLimit(Server $server, int $size): bool
-    {
-        return $server->backup_size_limit <= 0 || $size <= $this->getSizeLimit($server);
-    }
-
     /**
      * @throws \Throwable
      */
@@ -73,11 +68,6 @@ class BackupQuotaService
     private function getStorageLimit(Server $server): int
     {
         return $server->backup_storage_limit * self::BYTES_PER_MIB;
-    }
-
-    private function getSizeLimit(Server $server): int
-    {
-        return $server->backup_size_limit * self::BYTES_PER_MIB;
     }
 
     /**
