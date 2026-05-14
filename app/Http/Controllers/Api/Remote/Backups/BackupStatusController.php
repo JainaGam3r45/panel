@@ -60,10 +60,7 @@ class BackupStatusController extends Controller
 
         if ($successful) {
             $size = (int) $request->input('size');
-            if (!$this->backupQuotaService->sizeFitsLimit($server, $size)) {
-                $successful = false;
-                $failureReason = sprintf('Backup exceeds the %d MiB per-backup size limit.', $server->backup_size_limit);
-            } elseif (!$this->backupQuotaService->prepareStorageForCompletedBackup($model, $size)) {
+            if (!$this->backupQuotaService->prepareStorageForCompletedBackup($model, $size)) {
                 $successful = false;
                 $failureReason = sprintf('Backup exceeds the %d MiB total backup storage limit.', $server->backup_storage_limit);
             }

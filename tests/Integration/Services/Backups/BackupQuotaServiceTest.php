@@ -66,14 +66,6 @@ class BackupQuotaServiceTest extends IntegrationTestCase
         $this->getService()->ensureStorageIsAvailable($server, true);
     }
 
-    public function testBackupSizeLimitIsAppliedInMib()
-    {
-        $server = $this->createServerModel(['backup_size_limit' => 2]);
-
-        $this->assertTrue($this->getService()->sizeFitsLimit($server, 2 * 1024 * 1024));
-        $this->assertFalse($this->getService()->sizeFitsLimit($server, (2 * 1024 * 1024) + 1));
-    }
-
     public function testCompletedBackupPrunesOldBackupsBeforeFailingCurrentBackup()
     {
         $server = $this->createServerModel(['backup_storage_limit' => 2]);

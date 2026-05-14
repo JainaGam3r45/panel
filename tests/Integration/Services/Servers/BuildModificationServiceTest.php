@@ -123,7 +123,6 @@ class BuildModificationServiceTest extends IntegrationTestCase
             'disk' => 1024,
             'backup_limit' => null,
             'backup_storage_limit' => 512,
-            'backup_size_limit' => 128,
             'database_limit' => 10,
             'allocation_limit' => 20,
         ]);
@@ -137,7 +136,6 @@ class BuildModificationServiceTest extends IntegrationTestCase
         $this->assertSame(1024, $response->disk);
         $this->assertSame(0, $response->backup_limit);
         $this->assertSame(512, $response->backup_storage_limit);
-        $this->assertSame(128, $response->backup_size_limit);
         $this->assertSame(10, $response->database_limit);
         $this->assertSame(20, $response->allocation_limit);
     }

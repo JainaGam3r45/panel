@@ -539,7 +539,6 @@ CREATE TABLE `servers` (
   `database_limit` int(10) unsigned DEFAULT 0,
   `backup_limit` int(10) unsigned NOT NULL DEFAULT 0,
   `backup_storage_limit` int(10) unsigned NOT NULL DEFAULT 0,
-  `backup_size_limit` int(10) unsigned NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `installed_at` timestamp NULL DEFAULT NULL,

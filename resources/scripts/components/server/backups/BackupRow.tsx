@@ -21,7 +21,6 @@ interface Props {
 
 export default ({ backup, className }: Props) => {
     const { mutate } = getServerBackups();
-    const backupSizeLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backupSize);
     const backupStorageLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backupStorage);
 
     useWebsocketEvent(`${SocketEvent.BACKUP_COMPLETED}:${backup.uuid}` as SocketEvent, (data) => {
@@ -30,9 +29,7 @@ export default ({ backup, className }: Props) => {
             const fileSize = parsed.file_size || 0;
             const failureReason =
                 parsed.is_successful === false
-                    ? backupSizeLimit > 0 && fileSize > backupSizeLimit * 1024 * 1024
-                        ? `Backup exceeds the ${backupSizeLimit} MiB per-backup size limit.`
-                        : backupStorageLimit > 0
+                    ? backupStorageLimit > 0
                         ? `Backup exceeds the ${backupStorageLimit} MiB total backup storage limit.`
                         : 'Backup failed to complete.'
                     : null;
