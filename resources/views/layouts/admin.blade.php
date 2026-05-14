@@ -155,7 +155,11 @@
                 </section>
             </div>
             <footer class="main-footer">
-                <div class="text-right small text-gray">
+                <div class="pull-right small text-gray" style="margin-right:10px;margin-top:-7px;">
+                    <strong><i class="fa fa-fw {{ $appIsGit ? 'fa-git-square' : 'fa-code-fork' }}"></i></strong> {{ $appVersion }}<br />
+                    <strong><i class="fa fa-fw fa-clock-o"></i></strong> {{ round(microtime(true) - LARAVEL_START, 3) }}s
+                </div>
+                <div class="small text-gray" style="text-align:right;margin-right:110px;">
                     <a href="https://www.jifercraft.com" target="_blank" rel="noopener noreferrer">JiferCloud Hosting</a> &copy; 2020 - {{ date('Y') }}<br />
                     Expansión de JiferCraft Studios
                 </div>
