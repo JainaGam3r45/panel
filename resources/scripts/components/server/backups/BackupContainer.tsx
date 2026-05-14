@@ -70,17 +70,16 @@ const BackupContainer = () => {
                     Backups cannot be created for this server because the backup storage limit has been reached.
                 </p>
             )}
+            {backupStorageLimit > 0 && (
+                <p css={tw`mt-6 text-center text-sm text-neutral-300`}>
+                    {bytesToString(backups.backupBytes)} of {bytesToString(backupStorageLimitBytes)} backup storage used.
+                </p>
+            )}
             <Can action={'backup.create'}>
                 <div css={tw`mt-6 sm:flex items-center justify-end`}>
                     {backupLimit > 0 && backups.backupCount > 0 && (
                         <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
                             {backups.backupCount} of {backupLimit} backups have been created for this server.
-                        </p>
-                    )}
-                    {backupStorageLimit > 0 && (
-                        <p css={tw`text-sm text-neutral-300 mb-4 sm:mr-6 sm:mb-0`}>
-                            {bytesToString(backups.backupBytes)} of {bytesToString(backupStorageLimitBytes)} backup
-                            storage used.
                         </p>
                     )}
                     {canCreateBackup && <CreateBackupButton css={tw`w-full sm:w-auto`} />}
