@@ -50,6 +50,7 @@ class BackupQuotaServiceTest extends IntegrationTestCase
         $this->getService()->ensureStorageIsAvailable($server, true);
 
         $this->assertSoftDeleted($backup);
+        $this->assertActivityFor('server:backup.prune', null, $backup, $server);
     }
 
     public function testOverrideDoesNotRotateLockedBackups()

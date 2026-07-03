@@ -75,6 +75,11 @@ const BackupContainer = () => {
                     {bytesToString(backups.backupBytes)} of {bytesToString(backupStorageLimitBytes)} backup storage used.
                 </p>
             )}
+            {backupStorageLimit > 0 && (
+                <p css={tw`mt-1 text-center text-xs text-neutral-400`}>
+                    Old unlocked backups may be automatically deleted when this storage limit is reached.
+                </p>
+            )}
             <Can action={'backup.create'}>
                 <div css={tw`mt-6 sm:flex items-center justify-end`}>
                     {backupLimit > 0 && backups.backupCount > 0 && (

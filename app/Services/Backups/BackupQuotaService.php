@@ -4,6 +4,7 @@ namespace Pterodactyl\Services\Backups;
 
 use Pterodactyl\Models\Backup;
 use Pterodactyl\Models\Server;
+use Pterodactyl\Facades\Activity;
 use Pterodactyl\Exceptions\Service\Backup\BackupStorageLimitException;
 
 class BackupQuotaService
@@ -93,6 +94,15 @@ class BackupQuotaService
             if (!$oldest) {
                 return false;
             }
+
+            Activity::event('server:backup.prune')
+                ->subject($oldest, $server)
+                ->property([
+                    'name' => $oldest->name,
+                    'bytes' => $oldest->bytes,
+                    'limit' => $server->backup_storage_limit,
+                ])
+                ->log();
 
             $this->deleteBackupService->handle($oldest);
         }
