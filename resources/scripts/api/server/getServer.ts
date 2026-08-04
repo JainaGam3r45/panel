@@ -56,7 +56,6 @@ export interface Server {
         databases: number;
         allocations: number;
         backups: number;
-        backupStorage: number;
     };
     isTransferring: boolean;
     skipScripts: boolean;
@@ -87,7 +86,6 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
         databases: data.feature_limits.databases,
         allocations: data.feature_limits.allocations,
         backups: data.feature_limits.backups,
-        backupStorage: data.feature_limits.backup_storage,
     },
     isTransferring: data.is_transferring,
     skipScripts: data.skip_scripts,
