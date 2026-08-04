@@ -18,7 +18,7 @@ const BackupContainer = () => {
     const { data: backups, error, isValidating } = getServerBackups();
 
     const backupLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backups);
-    const backupStorageLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backupStorage);
+    const diskLimit = ServerContext.useStoreState((state) => state.server.data!.limits.disk);
 
     useEffect(() => {
         if (!error) {
@@ -34,9 +34,9 @@ const BackupContainer = () => {
         return <Spinner size={'large'} centered />;
     }
 
-    const backupStorageLimitBytes = backupStorageLimit > 0 ? mbToBytes(backupStorageLimit) : 0;
+    const diskLimitBytes = diskLimit > 0 ? mbToBytes(diskLimit) : 0;
     const canCreateBackup =
-        backupLimit > 0 && backupLimit > backups.backupCount && (!backupStorageLimitBytes || backups.backupBytes < backupStorageLimitBytes);
+        backupLimit > 0 && backupLimit > backups.backupCount && (!diskLimitBytes || backups.backupBytes < diskLimitBytes);
 
     return (
         <ServerContentBlock title={'Backups'}>
@@ -65,19 +65,16 @@ const BackupContainer = () => {
                     Backups cannot be created for this server because the backup limit is set to 0.
                 </p>
             )}
-            {!!backupStorageLimitBytes && backups.backupBytes >= backupStorageLimitBytes && (
+            {!!diskLimitBytes && backups.backupBytes >= diskLimitBytes && (
                 <p css={tw`text-center text-sm text-neutral-300`}>
-                    Backups cannot be created for this server because the backup storage limit has been reached.
+                    Backups cannot be created for this server because the disk space limit for backup storage has been
+                    reached.
                 </p>
             )}
-            {backupStorageLimit > 0 && (
+            {diskLimit > 0 && (
                 <p css={tw`mt-6 text-center text-sm text-neutral-300`}>
-                    {bytesToString(backups.backupBytes)} of {bytesToString(backupStorageLimitBytes)} backup storage used.
-                </p>
-            )}
-            {backupStorageLimit > 0 && (
-                <p css={tw`mt-1 text-center text-xs text-neutral-400`}>
-                    Old unlocked backups may be automatically deleted when this storage limit is reached.
+                    {bytesToString(backups.backupBytes)} of {bytesToString(diskLimitBytes)} backup storage used (disk
+                    space limit).
                 </p>
             )}
             <Can action={'backup.create'}>
