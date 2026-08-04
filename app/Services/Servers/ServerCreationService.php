@@ -162,7 +162,6 @@ class ServerCreationService
             'database_limit' => Arr::get($data, 'database_limit') ?? 0,
             'allocation_limit' => Arr::get($data, 'allocation_limit') ?? 0,
             'backup_limit' => Arr::get($data, 'backup_limit') ?? 0,
-            'backup_storage_limit' => Arr::get($data, 'backup_storage_limit') ?? 0,
         ]);
 
         return $model;
