@@ -59,6 +59,7 @@ export interface Server {
         backupStorage: number;
     };
     isTransferring: boolean;
+    skipScripts: boolean;
     variables: ServerEggVariable[];
     allocations: Allocation[];
 }
@@ -89,6 +90,7 @@ export const rawDataToServerObject = ({ attributes: data }: FractalResponseData)
         backupStorage: data.feature_limits.backup_storage,
     },
     isTransferring: data.is_transferring,
+    skipScripts: data.skip_scripts,
     variables: ((data.relationships?.variables as FractalResponseList | undefined)?.data || []).map(
         rawDataToServerEggVariable
     ),
