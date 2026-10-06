@@ -1,61 +1,38 @@
-import React, { forwardRef } from 'react';
-import { Form } from 'formik';
-import styled from 'styled-components/macro';
-import { breakpoint } from '@/theme';
-import FlashMessageRender from '@/components/FlashMessageRender';
-import tw from 'twin.macro';
+import React from 'react';
+import Form from '@/components/form/Form';
+import PterodactylMark from '@/components/elements/PterodactylMark';
 
-type Props = React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement> & {
+interface Props {
+    form: { handleSubmit: () => unknown };
     title?: string;
-};
+    className?: string;
+    children: React.ReactNode;
+}
 
-const Container = styled.div`
-    ${breakpoint('sm')`
-        ${tw`w-4/5 mx-auto`}
-    `};
-
-    ${breakpoint('md')`
-        ${tw`p-10`}
-    `};
-
-    ${breakpoint('lg')`
-        ${tw`w-3/5`}
-    `};
-
-    ${breakpoint('xl')`
-        ${tw`w-full`}
-        max-width: 700px;
-    `};
-`;
-
-export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => (
-    <Container>
-        {title && <h2 css={tw`text-3xl text-center text-neutral-100 font-medium py-4`}>{title}</h2>}
-        <FlashMessageRender css={tw`mb-2 px-1`} />
-        <Form {...props} ref={ref}>
-            <div css={tw`md:flex w-full bg-white shadow-lg rounded-lg p-6 md:pl-0 mx-1`}>
-                <div css={tw`flex-none select-none mb-6 md:mb-0 self-center`}>
-                    <img
-                        src={'/favicons/android-chrome-512x512.png'}
-                        alt={'JiferCloud'}
-                        css={tw`block w-40 md:w-52 mx-auto rounded-lg`}
-                    />
+export default function LoginFormContainer({ form, title, className, children }: Props) {
+    return (
+        <div className={'sm:mx-auto sm:w-4/5 md:p-10 lg:w-3/5 xl:w-full xl:max-w-auth'}>
+            {title && <h2 className={'text-3xl text-center text-foreground font-medium py-4'}>{title}</h2>}
+            <Form form={form} className={className}>
+                <div className={'md:flex w-full bg-card text-card-foreground shadow-lg rounded-lg p-6 md:pl-0 mx-1'}>
+                    <div className={'flex-none select-none mb-6 md:mb-0 self-center'}>
+                        <PterodactylMark className={'block w-32 md:w-56 h-auto mx-auto md:px-12'} />
+                    </div>
+                    <div className={'flex-1'}>{children}</div>
                 </div>
-                <div css={tw`flex-1`}>{props.children}</div>
-            </div>
-        </Form>
-        <p css={tw`text-center text-neutral-500 text-xs mt-4`}>
-            <a
-                rel={'noopener noreferrer'}
-                href={'https://www.jifercraft.com/'}
-                target={'_blank'}
-                css={tw`no-underline text-neutral-500 hover:text-neutral-300`}
-            >
-                JiferCloud Hosting&reg;
-            </a>
-            &nbsp;&copy; 2020 - {new Date().getFullYear()}
-            <br />
-            Expansi&oacute;n de JiferCraft Studios
-        </p>
-    </Container>
-));
+            </Form>
+            <p className={'text-center text-muted-foreground text-xs mt-4'}>
+                &copy; 2015 - <span suppressHydrationWarning>{new Date().getFullYear()}</span>
+                &nbsp;
+                <a
+                    rel={'noopener nofollow noreferrer'}
+                    href={'https://pterodactyl.io'}
+                    target={'_blank'}
+                    className={'no-underline text-muted-foreground hover:text-muted-foreground'}
+                >
+                    Pterodactyl Software
+                </a>
+            </p>
+        </div>
+    );
+}

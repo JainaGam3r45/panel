@@ -10,11 +10,11 @@ export enum SocketEvent {
     TRANSFER_LOGS = 'transfer logs',
     TRANSFER_STATUS = 'transfer status',
     BACKUP_COMPLETED = 'backup completed',
-    BACKUP_PROGRESS = 'backup progress',
     BACKUP_RESTORE_COMPLETED = 'backup restore completed',
 }
 
 export enum SocketRequest {
+    SEND_COMMAND = 'send command',
     SEND_LOGS = 'send logs',
     SEND_STATS = 'send stats',
     SET_STATE = 'set state',

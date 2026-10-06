@@ -1,40 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pterodactyl\Extensions\Laravel\Sanctum;
 
 use Pterodactyl\Models\ApiKey;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
 
-class NewAccessToken implements Arrayable, Jsonable
+/**
+ * Panel equivalent of Sanctum's NewAccessToken value object. It is intentionally
+ * not a subclass: Sanctum natively types its token property as
+ * PersonalAccessToken, which the panel's ApiKey model does not extend.
+ */
+class NewAccessToken
 {
-    /**
-     * NewAccessToken constructor.
-     */
-    public function __construct(public ApiKey $accessToken, public string $plainTextToken)
-    {
-    }
-
-    /**
-     * Get the instance as an array.
-     *
-     * @return array<string, ApiKey|string>
-     */
-    public function toArray()
-    {
-        return [
-            'accessToken' => $this->accessToken,
-            'plainTextToken' => $this->plainTextToken,
-        ];
-    }
-
-    /**
-     * Convert the object to its JSON representation.
-     *
-     * @param int $options
-     */
-    public function toJson($options = 0)
-    {
-        return json_encode($this->toArray(), $options);
-    }
+    public function __construct(
+        public ApiKey $accessToken,
+        public string $plainTextToken,
+    ) {}
 }

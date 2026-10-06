@@ -1,26 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pterodactyl\Http\Requests\Api\Client\Servers\Files;
 
-use Pterodactyl\Models\Permission;
-use Pterodactyl\Contracts\Http\ClientPermissionsRequest;
+use Pterodactyl\Enum\Permissions;
 use Pterodactyl\Http\Requests\Api\Client\ClientApiRequest;
+use Pterodactyl\Models\Server;
 
-class PullFileRequest extends ClientApiRequest implements ClientPermissionsRequest
+class PullFileRequest extends ClientApiRequest
 {
-    public function permission(): string
+    /**
+     * {@inheritdoc}
+     */
+    public function authorize(): bool
     {
-        return Permission::ACTION_FILE_CREATE;
+        $server = $this->parameter('server', Server::class);
+
+        return $this->user()->can(Permissions::FileCreate->value, $server)
+            && $this->user()->can(Permissions::FileUpdate->value, $server);
     }
 
+    /**
+     * @return ValidationRules
+     */
     public function rules(): array
     {
         return [
-            'url' => 'required|string|url',
-            'directory' => 'nullable|string',
-            'filename' => 'nullable|string',
-            'use_header' => 'boolean',
-            'foreground' => 'boolean',
+            'url' => ['required', 'string', 'url'],
+            'directory' => ['nullable', 'string'],
+            'filename' => ['nullable', 'string'],
+            'use_header' => ['boolean'],
+            'foreground' => ['boolean'],
         ];
     }
 }
