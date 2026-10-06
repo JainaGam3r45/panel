@@ -1,6 +1,5 @@
 import React from 'react';
 import Form from '@/components/form/Form';
-import PterodactylMark from '@/components/elements/PterodactylMark';
 
 interface Props {
     form: { handleSubmit: () => unknown };
@@ -16,22 +15,27 @@ export default function LoginFormContainer({ form, title, className, children }:
             <Form form={form} className={className}>
                 <div className={'md:flex w-full bg-card text-card-foreground shadow-lg rounded-lg p-6 md:pl-0 mx-1'}>
                     <div className={'flex-none select-none mb-6 md:mb-0 self-center'}>
-                        <PterodactylMark className={'block w-32 md:w-56 h-auto mx-auto md:px-12'} />
+                        <img
+                            src={'/favicons/android-chrome-512x512.png'}
+                            alt={'JiferCloud'}
+                            className={'block w-40 md:w-52 h-auto mx-auto rounded-lg'}
+                        />
                     </div>
                     <div className={'flex-1'}>{children}</div>
                 </div>
             </Form>
             <p className={'text-center text-muted-foreground text-xs mt-4'}>
-                &copy; 2015 - <span suppressHydrationWarning>{new Date().getFullYear()}</span>
-                &nbsp;
                 <a
-                    rel={'noopener nofollow noreferrer'}
-                    href={'https://pterodactyl.io'}
+                    rel={'noopener noreferrer'}
+                    href={'https://www.jifercraft.com/'}
                     target={'_blank'}
                     className={'no-underline text-muted-foreground hover:text-muted-foreground'}
                 >
-                    Pterodactyl Software
+                    JiferCloud Hosting&reg;
                 </a>
+                &nbsp;&copy; 2020 - <span suppressHydrationWarning>{new Date().getFullYear()}</span>
+                <br />
+                Expansión de JiferCraft Studios
             </p>
         </div>
     );

@@ -19,14 +19,16 @@ const PageContentBlock = ({ title, className, children }: PageContentBlockProps)
             <ContentContainer className={'mb-4'}>
                 <p className={'text-center text-muted-foreground text-xs'}>
                     <a
-                        rel={'noopener nofollow noreferrer'}
-                        href={'https://pterodactyl.io'}
+                        rel={'noopener noreferrer'}
+                        href={'https://www.jifercraft.com/'}
                         target={'_blank'}
                         className={'no-underline text-muted-foreground hover:text-muted-foreground'}
                     >
-                        Pterodactyl&reg;
+                        JiferCloud Hosting&reg;
                     </a>
-                    &nbsp;&copy; 2015 - <span suppressHydrationWarning>{new Date().getFullYear()}</span>
+                    &nbsp;&copy; 2020 - <span suppressHydrationWarning>{new Date().getFullYear()}</span>
+                    <br />
+                    Expansión de JiferCraft Studios
                 </p>
             </ContentContainer>
         </div>
