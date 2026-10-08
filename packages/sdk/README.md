@@ -252,6 +252,13 @@ the previous package and asset pointer; partially applied database migrations ne
 recovery. Successful lifecycle changes invalidate routes and signal queue worker restarts;
 reload the page to replace already evaluated frontend code.
 
+Migrations live in `database/migrations`. The panel registers that directory with
+Laravel's migrator for every enabled extension, so `migrate:status` lists the migrations
+and `migrate:rollback` finds them; a provider does not need to call
+`loadExtensionMigrations()`. Laravel records a migration by its file name, so enabling
+refuses an extension with a migration named like one of the panel's or another installed
+extension's, and `p:extension:doctor` reports it.
+
 Backend settings support `forUser($user)` and `forServer($server)`. Mark secrets with
 `->secret()` to encrypt storage, mask admin output as `********`, and prohibit frontend
 exposure; `->field('password')` is always secret. A secret submitted empty, as its mask,
@@ -322,13 +329,32 @@ not a durable job audit log.
 
 ## Backend provider API
 
-The manifest's `provider` class is loaded through its `autoload` map of PSR-4 prefixes to
-package directories, such as `{ "Acme\\Billing\\": "src" }`. A prefix cannot equal, contain
+The manifest's `provider` class is loaded through a map of PSR-4 prefixes to package
+directories, such as `{ "Acme\\Billing\\": "src" }`. Scaffolds keep it in `composer.json`
+under `autoload.psr-4`, where Composer, editors and static analysis read it too; an
+`autoload` map in `extension.json` takes its place when present. A prefix cannot equal, contain
 or sit inside `Pterodactyl\`, `Illuminate\`, `Laravel\`, `Symfony\` or a namespace of the
 panel's Composer packages, and enabling fails while another enabled extension autoloads an
 overlapping prefix. Extension class loaders are registered behind the panel's, so once an
 extension's `vendor/autoload.php` has returned, a class the panel or its packages provide
 always comes from the panel.
+
+Composer names the class `vendor/autoload.php` declares after the lock file's hash unless
+`config.autoloader-suffix` sets it, so two packages installed from the same requirements
+declare the same class, and PHP cannot recover from declaring it twice. The panel refuses
+to enable or load an extension whose suffix the panel or another enabled extension already
+uses. Give each extension a suffix of its own in its `composer.json`:
+
+```json
+{ "config": { "autoloader-suffix": "AcmeBillingExtension" } }
+```
+
+Build `vendor/` with `composer install --no-dev --optimize-autoloader` before packing.
+`p:extension:doctor` and `p:extension:pack` read `vendor/composer/installed.json` and warn
+about development packages left in `vendor/`, about `composer.json` requirements the
+panel's copy of a package does not satisfy, and about bundled packages the panel loads at
+another version. None of these stop the extension from loading, but its code runs with the
+panel's copy of any package both ship.
 
 Providers can use `listenToServerOperations` for immutable `provision`, `install`,
 `reinstall`, `backup`, `delete`, `suspend`, `unsuspend`, and `transfer` results. Results
@@ -404,7 +430,11 @@ booted successfully. A command's name and every alias must start with the extens
 a colon (`myext:clean-logs`) and must not already exist; a command that breaks either rule
 is left out and recorded against the extension. A scheduled task that fails, or a schedule
 callback that throws, is recorded against the extension; a callback that throws schedules
-nothing.
+nothing. As with Laravel's own commands, one that declares its name with `#[AsCommand]` is
+only constructed when it runs; any other is constructed whenever artisan starts.
+
+`php artisan about` lists every installed extension with its version and state under
+"Extensions".
 
 ### Head tags
 
