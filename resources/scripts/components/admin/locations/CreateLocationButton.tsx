@@ -5,6 +5,7 @@ import { Dialog } from '@/components/elements/dialog';
 import SpinnerOverlay from '@/components/elements/SpinnerOverlay';
 import Button from '@/components/elements/Button';
 import { NewButton } from '@/components/elements/NewButton';
+import { validateShortCode } from '@/components/admin/locations/locationForm';
 
 type CreateLocationDialogProps = {
     open: boolean;
@@ -31,36 +32,31 @@ function CreateLocationDialog({ open, onClose }: CreateLocationDialogProps) {
     return (
         <Dialog
             open={open}
-            title={'Create new location'}
+            title='Create new location'
             preventExternalClose={isSubmitting}
             hideCloseIcon={isSubmitting}
             onClose={onClose}
         >
             <SpinnerOverlay visible={isSubmitting} />
-            <Form form={form} className={'m-0'}>
+            <Form form={form} className='m-0'>
                 <form.AppField
-                    name={'short'}
+                    name='short'
                     validators={{
-                        onChange: ({ value }) =>
-                            value.length < 1
-                                ? 'A short code must be provided.'
-                                : value.length <= 60
-                                  ? undefined
-                                  : 'A short code must not exceed 60 characters.',
+                        onChange: ({ value }) => validateShortCode(value),
                     }}
                 >
                     {(field) => (
                         <field.TextField
-                            type={'text'}
-                            id={'short'}
-                            label={'Short Code'}
-                            description={'A short identifier used to distinguish this location from others.'}
+                            type='text'
+                            id='short'
+                            label='Short Code'
+                            description='A short identifier used to distinguish this location from others.'
                         />
                     )}
                 </form.AppField>
-                <div className={'mt-6'}>
+                <div className='mt-6'>
                     <form.AppField
-                        name={'long'}
+                        name='long'
                         validators={{
                             onChange: ({ value }) =>
                                 value.length <= 191 ? undefined : 'The description must not exceed 191 characters.',
@@ -68,22 +64,20 @@ function CreateLocationDialog({ open, onClose }: CreateLocationDialogProps) {
                     >
                         {(field) => (
                             <field.TextField
-                                type={'text'}
-                                id={'long'}
-                                label={'Description'}
-                                description={'A longer description of this location.'}
+                                type='text'
+                                id='long'
+                                label='Description'
+                                description='A longer description of this location.'
                             />
                         )}
                     </form.AppField>
                 </div>
-                <div className={'flex flex-wrap justify-end mt-6'}>
-                    <Button type={'button'} isSecondary className={'w-full sm:w-auto sm:mr-2'} onClick={onClose}>
+                <div className='flex flex-wrap justify-end mt-6'>
+                    <Button type='button' isSecondary className='w-full sm:w-auto sm:mr-2' onClick={onClose}>
                         Cancel
                     </Button>
                     <form.AppForm>
-                        <form.SubmitButton className={'w-full mt-4 sm:w-auto sm:mt-0'}>
-                            Create Location
-                        </form.SubmitButton>
+                        <form.SubmitButton className='w-full mt-4 sm:w-auto sm:mt-0'>Create Location</form.SubmitButton>
                     </form.AppForm>
                 </div>
             </Form>

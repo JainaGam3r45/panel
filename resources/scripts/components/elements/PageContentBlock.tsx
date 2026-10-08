@@ -16,13 +16,13 @@ const PageContentBlock = ({ title, className, children }: PageContentBlockProps)
     return (
         <div>
             <ContentContainer className={cn('my-4 sm:my-6', className)}>{children}</ContentContainer>
-            <ContentContainer className={'mb-4'}>
-                <p className={'text-center text-muted-foreground text-xs'}>
+            <ContentContainer className='mb-4'>
+                <p className='text-center text-muted-foreground text-xs'>
                     <a
-                        rel={'noopener noreferrer'}
-                        href={'https://www.jifercraft.com/'}
-                        target={'_blank'}
-                        className={'no-underline text-muted-foreground hover:text-muted-foreground'}
+                        rel='noopener noreferrer'
+                        href='https://www.jifercraft.com/'
+                        target='_blank'
+                        className='no-underline text-muted-foreground hover:text-muted-foreground'
                     >
                         JiferCloud Hosting&reg;
                     </a>
