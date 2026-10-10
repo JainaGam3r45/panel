@@ -6,8 +6,6 @@ namespace Pterodactyl\Http\Controllers\Api\Admin\Extensions;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use Knuckles\Scribe\Attributes\BodyParam;
 use Knuckles\Scribe\Attributes\Endpoint;
 use Knuckles\Scribe\Attributes\Group;
@@ -21,6 +19,7 @@ use Pterodactyl\Contracts\Extensions\UpdatesExtensionSettings;
 use Pterodactyl\Extensions\Scribe\Attributes\ResponseField;
 use Pterodactyl\Http\Controllers\Api\Admin\AdminApiController;
 use Pterodactyl\Http\Requests\Api\Admin\Extensions\DeleteExtensionRequest;
+use Pterodactyl\Http\Requests\Api\Admin\Extensions\GetExtensionFormsRequest;
 use Pterodactyl\Http\Requests\Api\Admin\Extensions\GetExtensionsRequest;
 use Pterodactyl\Http\Requests\Api\Admin\Extensions\InstallExtensionRequest;
 use Pterodactyl\Http\Requests\Api\Admin\Extensions\UpdateExtensionRequest;
@@ -28,11 +27,13 @@ use Pterodactyl\Http\Requests\Api\Admin\Extensions\UpdateExtensionSettingsReques
 use Pterodactyl\Http\Requests\Api\Admin\Extensions\UploadExtensionSettingFileRequest;
 use Pterodactyl\Models\Extension;
 use Pterodactyl\Services\Extensions\ExtensionAssetPublisher;
+use Pterodactyl\Services\Extensions\ExtensionFields;
 use Pterodactyl\Services\Extensions\ExtensionManifest;
 use Pterodactyl\Services\Extensions\ExtensionRepository;
 use Pterodactyl\Services\Extensions\ExtensionSettingDefinition;
 use Pterodactyl\Services\Extensions\ExtensionSettingsDefinition;
 use Pterodactyl\Services\Extensions\ExtensionSettingsRegistry;
+use Pterodactyl\Support\JsonEmptyObject;
 
 #[Group('Admin API', 'Root administrator endpoints for managing panel configuration and resources.')]
 #[Subgroup('Extensions', 'Install, inspect, enable, disable, and remove panel extensions.')]
@@ -105,6 +106,15 @@ class ExtensionController extends AdminApiController
         ]);
     }
 
+    #[Endpoint('List extension forms', 'Returns, for each admin form, the enabled extensions that add fields to it and that the signed-in administrator may edit. Forms without extension fields are left out.')]
+    #[ScribeResponse(['data' => ['admin.user' => [['id' => 'example-extension', 'name' => 'Example Extension']]]], description: 'Extension forms returned.')]
+    public function forms(GetExtensionFormsRequest $request, ExtensionFields $fields): JsonResponse
+    {
+        $forms = config('extensions.enabled') ? $fields->forms() : [];
+
+        return new JsonResponse(['data' => $forms ?: new JsonEmptyObject]);
+    }
+
     #[Endpoint('Get extension icon', 'Returns the PNG, JPEG or WebP image an extension declares as its "icon". Extensions with a lucide icon name or no icon return not found.')]
     #[ScribeResponse('', description: 'Icon image returned.')]
     public function icon(GetExtensionsRequest $request, ExtensionRepository $extensions, ExtensionAssetPublisher $assets, string $extension): Response
@@ -133,19 +143,8 @@ class ExtensionController extends AdminApiController
         ExtensionAssetPublisher $assets,
     ): JsonResponse {
         $payload = $request->payload();
-        $uploaded = $payload['package'];
-        $workdir = storage_path('app'.DIRECTORY_SEPARATOR.'extensions-uploads');
-        $filename = Str::random(24).'.'.($uploaded->getClientOriginalExtension() ?: 'zip');
-
-        File::ensureDirectoryExists($workdir);
-        $uploaded->move($workdir, $filename);
-        $path = $workdir.DIRECTORY_SEPARATOR.$filename;
-
-        try {
-            $manifest = $installer->install($path, $payload['enable'], $payload['replace']);
-        } finally {
-            File::delete($path);
-        }
+        // Installed straight from PHP's upload, which PHP deletes once the request ends.
+        $manifest = $installer->install($payload['package']->getPathname(), $payload['enable'], $payload['replace']);
 
         return new JsonResponse([
             'data' => $this->serializeManifest($manifest, $extensions->records()->get($manifest->id), $assets),

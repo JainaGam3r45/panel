@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
+import { bytesRatioToString, mbToBytes } from '@/lib/formatters';
 import { useNavigate } from '@tanstack/react-router';
 import { deleteAdminNodeInput, type NodeUtilization } from '@/api/admin/nodes/queries';
 import { useAdminVersion } from '@/api/admin/version/queries';
@@ -47,6 +48,8 @@ const SystemInformationValue = ({ info, error, children }: SystemInformationValu
     return children(info);
 };
 
+const megabytes = (formatted: string): number => Number(formatted.replaceAll(',', ''));
+
 const UsageBox = ({ title, metric }: { title: string; metric: NodeUtilization['memory'] | undefined }) => {
     const percent = metric ? Math.min(metric.percent, 100) : 0;
     const colour = usageColour(metric);
@@ -54,7 +57,11 @@ const UsageBox = ({ title, metric }: { title: string; metric: NodeUtilization['m
     return (
         <TitledGreyBox title={title}>
             <p className='text-sm text-foreground'>
-                {metric ? `${metric.value} / ${metric.max} MiB` : <Spinner size='small' />}
+                {metric ? (
+                    bytesRatioToString(mbToBytes(megabytes(metric.value)), mbToBytes(megabytes(metric.max)))
+                ) : (
+                    <Spinner size='small' />
+                )}
             </p>
             <div className='mt-2 h-2 w-full rounded-sm bg-sunken overflow-hidden'>
                 <div

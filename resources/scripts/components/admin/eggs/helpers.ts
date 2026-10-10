@@ -1,5 +1,5 @@
 import type { AdminEgg, EggConfigurationBody, EggVariableBody } from '@/api/admin/eggs/queries';
-import { isObject } from '@/lib/objects';
+import { type ExtensionFormValues, initialExtensionValues } from '@/extensions/forms';
 
 export interface EggFormValues {
     name: string;
@@ -13,6 +13,7 @@ export interface EggFormValues {
     configStartup: string;
     configLogs: string;
     configFiles: string;
+    extensions: ExtensionFormValues;
 }
 
 export interface EggVariableValues {
@@ -80,12 +81,10 @@ const dockerImagesToString = (images: Record<string, string>): string =>
         .map(([name, image]) => (name === image ? image : `${name}|${image}`))
         .join('\n');
 
+// Null leaves the field empty so the egg inherits it from the egg it copies configuration from;
+// "{}" is shown as is, since it means the egg has none.
 const prettyJson = <T>(value: T): string => {
     if (value === null || value === undefined) {
-        return '';
-    }
-
-    if (isObject(value) && Object.keys(value).length === 0) {
         return '';
     }
 
@@ -108,6 +107,7 @@ export const eggToFormValues = (egg: AdminEgg): EggFormValues => ({
     configStartup: prettyJson(egg.attributes.config.startup),
     configLogs: prettyJson(egg.attributes.config.logs),
     configFiles: prettyJson(egg.attributes.config.files),
+    extensions: initialExtensionValues(),
 });
 
 export const emptyEggFormValues = (): EggFormValues => ({
@@ -122,6 +122,7 @@ export const emptyEggFormValues = (): EggFormValues => ({
     configStartup: '',
     configLogs: '',
     configFiles: '',
+    extensions: initialExtensionValues(),
 });
 
 export const toApiValues = (
@@ -144,6 +145,7 @@ export const toApiValues = (
         config_startup: nullIfEmpty(json.configStartup),
         config_logs: nullIfEmpty(json.configLogs),
         config_files: nullIfEmpty(json.configFiles),
+        extensions: values.extensions,
     };
 };
 
