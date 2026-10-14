@@ -11,10 +11,12 @@ function CorePageFooter({ className }: PageFooterProps) {
     return (
         <div {...ui('root', className)}>
             <p {...ui('text')}>
-                <a rel='noopener nofollow noreferrer' href='https://pterodactyl.io' target='_blank' {...ui('link')}>
-                    Pterodactyl&reg;
+                <a rel='noopener noreferrer' href='https://www.jifercraft.com/' target='_blank' {...ui('link')}>
+                    JiferCloud Hosting&reg;
                 </a>
-                &nbsp;&copy; 2015 - <span suppressHydrationWarning>{new Date().getFullYear()}</span>
+                &nbsp;&copy; 2020 - <span suppressHydrationWarning>{new Date().getFullYear()}</span>
+                <br />
+                Expansión de JiferCraft Studios
             </p>
         </div>
     );
