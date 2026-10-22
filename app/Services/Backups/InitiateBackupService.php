@@ -29,7 +29,6 @@ class InitiateBackupService
         private DaemonBackupRepository $daemonBackupRepository,
         private DeleteBackupService $deleteBackupService,
         private BackupManager $backupManager,
-        private BackupQuotaService $backupQuotaService,
     ) {
     }
 
@@ -106,8 +105,6 @@ class InitiateBackupService
 
             $this->deleteBackupService->handle($oldest);
         }
-
-        $this->backupQuotaService->ensureStorageIsAvailable($server, $override);
 
         return $this->connection->transaction(function () use ($server, $name) {
             /** @var Backup $backup */

@@ -10,7 +10,6 @@ import getServerBackups, { Context as ServerBackupContext } from '@/api/swr/getS
 import { ServerContext } from '@/state/server';
 import ServerContentBlock from '@/components/elements/ServerContentBlock';
 import Pagination from '@/components/elements/Pagination';
-import { bytesToString, mbToBytes } from '@/lib/formatters';
 
 const BackupContainer = () => {
     const { page, setPage } = useContext(ServerBackupContext);
@@ -18,7 +17,6 @@ const BackupContainer = () => {
     const { data: backups, error, isValidating } = getServerBackups();
 
     const backupLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backups);
-    const backupStorageLimit = ServerContext.useStoreState((state) => state.server.data!.featureLimits.backupStorage);
 
     useEffect(() => {
         if (!error) {
@@ -33,10 +31,6 @@ const BackupContainer = () => {
     if (!backups || (error && isValidating)) {
         return <Spinner size={'large'} centered />;
     }
-
-    const backupStorageLimitBytes = backupStorageLimit > 0 ? mbToBytes(backupStorageLimit) : 0;
-    const canCreateBackup =
-        backupLimit > 0 && backupLimit > backups.backupCount && (!backupStorageLimitBytes || backups.backupBytes < backupStorageLimitBytes);
 
     return (
         <ServerContentBlock title={'Backups'}>
@@ -65,16 +59,6 @@ const BackupContainer = () => {
                     Backups cannot be created for this server because the backup limit is set to 0.
                 </p>
             )}
-            {!!backupStorageLimitBytes && backups.backupBytes >= backupStorageLimitBytes && (
-                <p css={tw`text-center text-sm text-neutral-300`}>
-                    Backups cannot be created for this server because the backup storage limit has been reached.
-                </p>
-            )}
-            {backupStorageLimit > 0 && (
-                <p css={tw`mt-6 text-center text-sm text-neutral-300`}>
-                    {bytesToString(backups.backupBytes)} of {bytesToString(backupStorageLimitBytes)} backup storage used.
-                </p>
-            )}
             <Can action={'backup.create'}>
                 <div css={tw`mt-6 sm:flex items-center justify-end`}>
                     {backupLimit > 0 && backups.backupCount > 0 && (
@@ -82,7 +66,9 @@ const BackupContainer = () => {
                             {backups.backupCount} of {backupLimit} backups have been created for this server.
                         </p>
                     )}
-                    {canCreateBackup && <CreateBackupButton css={tw`w-full sm:w-auto`} />}
+                    {backupLimit > 0 && backupLimit > backups.backupCount && (
+                        <CreateBackupButton css={tw`w-full sm:w-auto`} />
+                    )}
                 </div>
             </Can>
         </ServerContentBlock>

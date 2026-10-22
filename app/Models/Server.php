@@ -43,7 +43,6 @@ use Pterodactyl\Exceptions\Http\Server\ServerStateConflictException;
  * @property int|null $allocation_limit
  * @property int|null $database_limit
  * @property int $backup_limit
- * @property int $backup_storage_limit
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $installed_at
@@ -174,7 +173,6 @@ class Server extends Model implements Identifiable
         'database_limit' => 'present|nullable|integer|min:0',
         'allocation_limit' => 'sometimes|nullable|integer|min:0',
         'backup_limit' => 'present|nullable|integer|min:0',
-        'backup_storage_limit' => 'present|nullable|integer|min:0',
     ];
 
     /**
@@ -196,7 +194,6 @@ class Server extends Model implements Identifiable
         'database_limit' => 'integer',
         'allocation_limit' => 'integer',
         'backup_limit' => 'integer',
-        'backup_storage_limit' => 'integer',
         self::CREATED_AT => 'datetime',
         self::UPDATED_AT => 'datetime',
         'deleted_at' => 'datetime',
