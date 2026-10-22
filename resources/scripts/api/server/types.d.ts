@@ -14,7 +14,6 @@ export interface ServerBackup {
     ignoredFiles: string;
     checksum: string;
     bytes: number;
-    failureReason: string | null;
     createdAt: Date;
     completedAt: Date | null;
 }

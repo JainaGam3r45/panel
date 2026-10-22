@@ -72,7 +72,6 @@ class ServerTransformer extends BaseClientTransformer
                 'databases' => $server->database_limit,
                 'allocations' => $server->allocation_limit,
                 'backups' => $server->backup_limit,
-                'backup_storage' => $server->backup_storage_limit,
             ],
             'status' => $server->status,
             // This field is deprecated, please use "status".

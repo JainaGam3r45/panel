@@ -9,7 +9,6 @@ use Illuminate\Http\JsonResponse;
 use Pterodactyl\Facades\Activity;
 use Pterodactyl\Exceptions\DisplayException;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\Services\Backups\BackupQuotaService;
 use Pterodactyl\Extensions\Backups\BackupManager;
 use Pterodactyl\Extensions\Filesystem\S3Filesystem;
 use Pterodactyl\Exceptions\Http\HttpForbiddenException;
@@ -21,10 +20,8 @@ class BackupStatusController extends Controller
     /**
      * BackupStatusController constructor.
      */
-    public function __construct(
-        private BackupManager $backupManager,
-        private BackupQuotaService $backupQuotaService,
-    ) {
+    public function __construct(private BackupManager $backupManager)
+    {
     }
 
     /**
@@ -55,21 +52,12 @@ class BackupStatusController extends Controller
             throw new BadRequestHttpException('Cannot update the status of a backup that is already marked as completed.');
         }
 
-        $successful = $request->boolean('successful');
-        $failureReason = $successful ? null : 'Backup failed to complete.';
-
-        if ($successful) {
-            $size = (int) $request->input('size');
-            if (!$this->backupQuotaService->prepareStorageForCompletedBackup($model, $size)) {
-                $successful = false;
-                $failureReason = sprintf('Backup exceeds the %d MiB total backup storage limit.', $server->backup_storage_limit);
-            }
-        }
-
-        $action = $successful ? 'server:backup.complete' : 'server:backup.fail';
+        $action = $request->boolean('successful') ? 'server:backup.complete' : 'server:backup.fail';
         $log = Activity::event($action)->subject($model, $model->server)->property('name', $model->name);
 
-        $log->transaction(function () use ($model, $request, $successful, $failureReason) {
+        $log->transaction(function () use ($model, $request) {
+            $successful = $request->boolean('successful');
+
             $model->fill([
                 'is_successful' => $successful,
                 // Change the lock state to unlocked if this was a failed backup so that it can be
@@ -78,7 +66,6 @@ class BackupStatusController extends Controller
                 'is_locked' => $successful ? $model->is_locked : false,
                 'checksum' => $successful ? ($request->input('checksum_type') . ':' . $request->input('checksum')) : null,
                 'bytes' => $successful ? $request->input('size') : 0,
-                'failure_reason' => $failureReason,
                 'completed_at' => CarbonImmutable::now(),
             ])->save();
 

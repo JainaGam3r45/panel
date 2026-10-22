@@ -53,7 +53,6 @@ class BackupController extends ClientApiController
             ->transformWith($this->getTransformer(BackupTransformer::class))
             ->addMeta([
                 'backup_count' => $this->repository->getNonFailedBackups($server)->count(),
-                'backup_bytes' => $this->repository->getNonFailedBackups($server)->sum('bytes'),
             ])
             ->toArray();
     }
